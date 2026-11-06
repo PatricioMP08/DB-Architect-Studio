@@ -25,10 +25,11 @@
     "oracle",
     "electron"
   ],
-  "author": "Patricio Morales <https://github.com/PatricioMP08>",
+  "author": "Patricio Mardones <https://github.com/PatricioMP08>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/PatricioMP08/DB-Architect-Studio.git"
   }
 }
+

@@ -2,6 +2,7 @@
   "name": "db-architect-studio-server",
   "version": "1.0.0",
   "private": true,
+  "author": "Patricio Mardones <https://github.com/PatricioMP08>",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",

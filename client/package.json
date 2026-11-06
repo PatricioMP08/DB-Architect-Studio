@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "description": "DB Architect Studio — Plataforma Profesional de Modelado Visual de Bases de Datos",
-  "author": "DB Architect Studio Team",
+  "author": "Patricio Mardones <https://github.com/PatricioMP08>",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {

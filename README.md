@@ -187,6 +187,12 @@ Para instrucciones detalladas paso a paso, consulta la [Guía de Instalación](d
 
 ---
 
+## 👨‍💻 Autor
+
+- **Patricio Mardones** — [@PatricioMP08](https://github.com/PatricioMP08)
+
+---
+
 ## 📄 Licencia
 
 Este proyecto está bajo la Licencia **MIT**. Consulta el archivo `LICENSE` para más información.
