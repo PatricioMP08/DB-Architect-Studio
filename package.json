@@ -1,0 +1,34 @@
+{
+  "name": "db-architect-studio-workspace",
+  "version": "1.0.0",
+  "description": "Plataforma Profesional de Modelado Visual, Documentación y Administración de Bases de Datos",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "build": "npm run build --prefix client",
+    "test": "npm run test --prefix client",
+    "electron:dev": "npm run electron:dev --prefix client",
+    "electron:build": "npm run electron:build --prefix client",
+    "electron:pack": "npm run electron:pack --prefix client"
+  },
+  "keywords": [
+    "database-design",
+    "er-diagram",
+    "sql-generator",
+    "schema-modeling",
+    "react-flow",
+    "postgresql",
+    "mysql",
+    "sqlite",
+    "sqlserver",
+    "oracle",
+    "electron"
+  ],
+  "author": "Patricio Morales <https://github.com/PatricioMP08>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PatricioMP08/DB-Architect-Studio.git"
+  }
+}
