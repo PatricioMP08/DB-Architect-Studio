@@ -96,7 +96,7 @@ aplicacion.post('/api/introspect', async (solicitud: Request, respuesta: Respons
   });
 });
 
-// Inicialización del servidor HTTP
-aplicacion.listen(PUERTO, () => {
+// Inicialización del servidor HTTP restringido a localhost
+aplicacion.listen(Number(PUERTO), 'localhost', () => {
   console.log(`🚀 DB Architect Studio Server corriendo en http://localhost:${PUERTO}`);
 });

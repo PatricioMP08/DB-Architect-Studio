@@ -13,7 +13,7 @@ export default defineConfig({
   },
   server: {
     port: 5173,
-    host: true,
+    host: 'localhost',
     watch: {
       ignored: ['**/release/**', '**/dist/**'], // Ignorar binarios de escritorio para evitar recargas innecesarias
     },
