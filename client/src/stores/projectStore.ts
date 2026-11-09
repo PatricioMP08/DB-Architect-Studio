@@ -785,7 +785,7 @@ export const useProjectStore = create<ProjectState>((set, get) => {
           tablas = tablas.map((t, i) => ({ ...t, position: { ...t.position, y: primerY + i * pasoY } }));
         }
 
-        return { project: { ...estado.project, tables } };
+        return { project: { ...estado.project, tables: tablas } };
       });
     },
 

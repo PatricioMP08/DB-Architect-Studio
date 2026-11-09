@@ -253,7 +253,7 @@ export function parseSqlDdl(sql: string, targetDialect: SupportedDialect = 'post
           const esNullable = !/NOT\s+NULL/i.test(restoDefinicion) && !esClavePrimaria;
           const esUnica = /UNIQUE/i.test(restoDefinicion);
 
-          const coincidenciaDefault = restoDefinicion.match(/DEFAULT\s+([^,;)\s]+(?:\([^)]*\))?)/i);
+          const coincidenciaDefault = restoDefinicion.match(/DEFAULT\s+([^,;()\s]+(?:\([^)]*\))?)/i);
           const valorPorDefecto = coincidenciaDefault ? coincidenciaDefault[1].replace(/^'|'$/g, '') : undefined;
 
           // Claves foráneas declaradas inline: REFERENCES tabla(col)
