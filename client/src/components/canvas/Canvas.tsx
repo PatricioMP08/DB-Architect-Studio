@@ -6,13 +6,15 @@ import {
   MiniMap,
   useNodesState,
   useEdgesState,
-  addEdge,
   Connection,
   Edge,
   Node,
   BackgroundVariant,
   MarkerType,
   OnConnect,
+  ReactFlowProvider,
+  useReactFlow,
+  useNodesInitialized,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -28,7 +30,6 @@ import {
   ZoomOut,
   AlignLeft,
   AlignStartVertical,
-  Sliders,
 } from 'lucide-react';
 
 // Registro de tipos de nodos personalizados para React Flow
@@ -41,7 +42,7 @@ const tiposDeArista = {
   relationshipEdge: RelationshipEdge,
 };
 
-export const Canvas: React.FC = () => {
+const CanvasInner: React.FC = () => {
   const {
     project,
     updateTablePosition,
@@ -64,6 +65,10 @@ export const Canvas: React.FC = () => {
   } = useUiStore();
 
   const reactFlowWrapper = useRef<HTMLDivElement>(null);
+  const haEnfocadoIdRef = useRef<string | null>(null);
+
+  const { fitView, zoomIn, zoomOut } = useReactFlow();
+  const nodesInitialized = useNodesInitialized();
 
   // Mapear tablas del Modelo Intermedio (IR) a Nodos visuales de React Flow
   const nodosLienzo: Node[] = useMemo(() => {
@@ -107,6 +112,41 @@ export const Canvas: React.FC = () => {
   useEffect(() => {
     establecerAristas(aristasLienzo);
   }, [aristasLienzo, establecerAristas]);
+
+  // Función para enfocar el diagrama con zoom nítido y legible
+  const enfocarTablas = useCallback((duracion = 400) => {
+    fitView({
+      padding: 0.2,
+      minZoom: 0.85,
+      maxZoom: 1.0,
+      duration: duracion,
+    });
+  }, [fitView]);
+
+  // Al iniciar o al cambiar el proyecto/tablas, enfocar automáticamente las tablas con zoom nítido y legible
+  useEffect(() => {
+    if (nodesInitialized && nodos.length > 0) {
+      const claveActual = `${project.id}_${nodos.length}`;
+      if (haEnfocadoIdRef.current !== claveActual) {
+        haEnfocadoIdRef.current = claveActual;
+        // Enfocar de inmediato
+        enfocarTablas(0);
+        // Y tras estabilización del layout de paneles
+        const temporizador = setTimeout(() => {
+          enfocarTablas(350);
+        }, 150);
+        return () => clearTimeout(temporizador);
+      }
+    }
+  }, [nodesInitialized, nodos.length, project.id, enfocarTablas]);
+
+  // Auto layout con re-enfoque automático
+  const manejarAutoLayout = useCallback(() => {
+    autoLayout();
+    setTimeout(() => {
+      enfocarTablas(400);
+    }, 60);
+  }, [autoLayout, enfocarTablas]);
 
   // Manejador de fin de arrastre de nodo para persistir posición en el store
   const alTerminarArrastreNodo = useCallback(
@@ -220,6 +260,11 @@ export const Canvas: React.FC = () => {
         nodeTypes={tiposDeNodo}
         edgeTypes={tiposDeArista}
         fitView
+        fitViewOptions={{
+          padding: 0.2,
+          minZoom: 0.85,
+          maxZoom: 1.0,
+        }}
         minZoom={0.2}
         maxZoom={2.5}
         defaultEdgeOptions={{
@@ -232,6 +277,18 @@ export const Canvas: React.FC = () => {
           gap={24}
           size={1.2}
           color={theme === 'dark' ? '#1E293B' : '#CBD5E1'}
+        />
+
+        <Controls
+          position="bottom-left"
+          showInteractive={false}
+          className="!bg-white/95 dark:!bg-slate-900/95 !border !border-slate-200 dark:!border-slate-800 !shadow-lg !rounded-xl !overflow-hidden [&>button]:!border-b [&>button]:!border-slate-200 dark:[&>button]:!border-slate-800 [&>button]:!bg-transparent hover:[&>button]:!bg-slate-100 dark:hover:[&>button]:!bg-slate-800 [&>button]:!text-slate-600 dark:[&>button]:!text-slate-300 [&>button>svg]:!fill-current"
+          fitViewOptions={{
+            padding: 0.2,
+            minZoom: 0.85,
+            maxZoom: 1.0,
+            duration: 400,
+          }}
         />
 
         {project.settings?.showMinimap && (
@@ -280,12 +337,39 @@ export const Canvas: React.FC = () => {
       {/* Floating Canvas Quick Bar */}
       <div className="absolute top-4 left-4 z-10 flex items-center gap-1.5 bg-white/95 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-1 rounded-xl shadow-md dark:shadow-xl transition-colors">
         <button
-          onClick={() => autoLayout()}
+          onClick={manejarAutoLayout}
           className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
           title="Organizar nodos automáticamente"
         >
           <Sparkles className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
           <span>Auto Layout</span>
+        </button>
+
+        <button
+          onClick={() => enfocarTablas(400)}
+          className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          title="Enfocar y centrar todas las tablas con zoom óptimo"
+        >
+          <Maximize2 className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+          <span>Enfocar Tablas</span>
+        </button>
+
+        <div className="w-[1px] h-4 bg-slate-200 dark:bg-slate-800" />
+
+        <button
+          onClick={() => zoomIn({ duration: 300 })}
+          className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          title="Acercar (Zoom +)"
+        >
+          <ZoomIn className="w-3.5 h-3.5" />
+        </button>
+
+        <button
+          onClick={() => zoomOut({ duration: 300 })}
+          className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          title="Alejar (Zoom -)"
+        >
+          <ZoomOut className="w-3.5 h-3.5" />
         </button>
 
         <div className="w-[1px] h-4 bg-slate-200 dark:bg-slate-800" />
@@ -317,9 +401,17 @@ export const Canvas: React.FC = () => {
       </div>
 
       {/* Subtle Hint on Canvas */}
-      <div className="absolute bottom-4 left-4 z-10 text-[11px] text-slate-400 dark:text-slate-500 font-mono select-none pointer-events-none">
+      <div className="absolute bottom-4 left-16 z-10 text-[11px] text-slate-400 dark:text-slate-500 font-mono select-none pointer-events-none">
         Tip: Doble clic en el lienzo para crear tabla | Arrastra conectores entre columnas para crear FKs
       </div>
     </div>
+  );
+};
+
+export const Canvas: React.FC = () => {
+  return (
+    <ReactFlowProvider>
+      <CanvasInner />
+    </ReactFlowProvider>
   );
 };
